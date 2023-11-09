@@ -1,27 +1,29 @@
 <?php
+require 'database.php';
 
-  require 'database.php';
+$message = '';
 
-  $message = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!empty($_POST['email']) && !empty($_POST['password'])) {
+        $sql = "INSERT INTO users (email, password) VALUES (:email, :password)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':email', $_POST['email']);
+        $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+        $stmt->bindParam(':password', $password);
 
-  if (!empty($_POST['email']) && !empty($_POST['password'])) {
-    $sql = "INSERT INTO users (email, password) VALUES (:email, :password)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':email', $_POST['email']);
-    $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
-    $stmt->bindParam(':password', $password);
-
-    if ($stmt->execute()) {
-      $message = 'Successfully created new user';
+        if ($stmt->execute()) {
+            $message = 'Successfully created new user';
+        } else {
+            $message = 'Sorry, there must have been an issue creating your account';
+        }
     } else {
-      $message = 'Sorry there must have been an issue creating your account';
+        $message = 'Please fill in both email and password fields.';
     }
-  }
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +31,6 @@
     <link rel="stylesheet" href="style.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
-
 <body>
     <div class="wrapper">
         <form action="Sign Up" method="post">
@@ -53,11 +54,18 @@
 
             <button type="submit" class="btn">Sign Up</button>
 
+            <div class="message">
+                <?php if (!empty($message)) : ?>
+                    <div class="success-message">
+                        <?php echo $message; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
             <div class="register-link">
                 <p>Already Have an Account? <a href="http://localhost:3000/NOVA/Login/index.php">Login</a></p>
             </div>
         </form>
     </div>
 </body>
-
 </html>

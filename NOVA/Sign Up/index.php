@@ -4,6 +4,7 @@ require 'database.php';
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+<<<<<<< HEAD
     if (!empty($_POST['username']) && !empty($_POST['email']) && !empty($_POST['password'])) {
         $conn = getConnection(); 
         $username = $_POST['username'];
@@ -18,10 +19,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($stmt->execute()) {
             $message = 'Successfully created a new user';
+=======
+    if (!empty($_POST['email']) && !empty($_POST['password'])) {
+        $sql = "INSERT INTO users (email, password) VALUES (:email, :password)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':email', $_POST['email']);
+        $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+        $stmt->bindParam(':password', $password);
+
+        if ($stmt->execute()) {
+            $message = 'Successfully created new user';
+>>>>>>> 5999d4de75987fb385caa0db98664cd6ebf6d956
         } else {
             $message = 'Sorry, there must have been an issue creating your account';
         }
     } else {
+<<<<<<< HEAD
         $message = 'Please fill in all fields (Username, Email, and Password).';
     }
 }
@@ -32,6 +45,11 @@ $sql = "SELECT * FROM users";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+=======
+        $message = 'Please fill in both email and password fields.';
+    }
+}
+>>>>>>> 5999d4de75987fb385caa0db98664cd6ebf6d956
 ?>
 
 <!DOCTYPE html>

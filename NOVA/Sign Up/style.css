@@ -123,6 +123,7 @@ font-size: 14px;
 .register-link p a:hover {
     text-decoration: underline;
 }
+<<<<<<< HEAD
 
 .users-table--edit{
     background: #009688;
@@ -138,3 +139,5 @@ font-size: 14px;
     text-align: center;
     font-weight: bold;
 }
+=======
+>>>>>>> 5999d4de75987fb385caa0db98664cd6ebf6d956

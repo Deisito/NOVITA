@@ -1,9 +1,9 @@
 <?php
 
-$server = 'localhost:3307';
+$server = 'localhost';
 $username = 'root';
 $password = '';
-$database = 'sign up';
+$database = 'signup';
 
 try {
   $conn = new PDO("mysql:host=$server;dbname=$database;", $username, $password);

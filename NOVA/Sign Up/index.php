@@ -1,27 +1,41 @@
 <?php
+require 'database.php';
 
-  require 'database.php';
+$message = '';
 
-  $message = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!empty($_POST['username']) && !empty($_POST['email']) && !empty($_POST['password'])) {
+        $conn = getConnection(); 
+        $username = $_POST['username'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
 
-  if (!empty($_POST['email']) && !empty($_POST['password'])) {
-    $sql = "INSERT INTO users (email, password) VALUES (:email, :password)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':email', $_POST['email']);
-    $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
-    $stmt->bindParam(':password', $password);
+        $sql = "INSERT INTO users (username, email, password) VALUES (:username, :email, :password)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':password', $password);
 
-    if ($stmt->execute()) {
-      $message = 'Successfully created new user';
+        if ($stmt->execute()) {
+            $message = 'Successfully created a new user';
+        } else {
+            $message = 'Sorry, there must have been an issue creating your account';
+        }
     } else {
-      $message = 'Sorry there must have been an issue creating your account';
+        $message = 'Please fill in all fields (Username, Email, and Password).';
     }
-  }
+}
+
+$conn = getConnection();
+
+$sql = "SELECT * FROM users";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +43,6 @@
     <link rel="stylesheet" href="style.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
-
 <body>
     <div class="wrapper">
         <form action="Sign Up" method="post">
@@ -53,11 +66,46 @@
 
             <button type="submit" class="btn">Sign Up</button>
 
+            <div class="message">
+                <?php if (!empty($message)) : ?>
+                    <div class="success-message">
+                        <?php echo $message; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
             <div class="register-link">
                 <p>Already Have an Account? <a href="http://localhost:3000/NOVA/Login/index.php">Login</a></p>
+            </div>
+
+            <div>
+                <h2>Usuarios Registrados</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Password</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($result as $row): ?>
+                        <tr>
+                            <td><?php echo $row['id']; ?></td>
+                            <td><?php echo $row['username']; ?></td>
+                            <td><?php echo $row['email']; ?></td>
+                            <td><?php echo $row['password']; ?></td>
+                            <th><a href="update.php?id=<?= $row['id'] ?>" class="users-table--edit">Editar</a></th>
+                            <th><a href="delete_user.php?id=<?= $row['id'] ?>" class="users-table--delete" >Eliminar</a></th>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>             
+                </table>
             </div>
         </form>
     </div>
 </body>
-
 </html>
